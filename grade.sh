@@ -1,21 +1,37 @@
 # Create your grading script here
 
-set -e
-
-[[ -e ListExamples.java ]]
+# set -e
 
 rm -rf student-submission
 git clone $1 student-submission
 
-# 1. Clone the repository of the student submission to a well-known directory name (provided in starter code)
-# - Useful tools here are if and -e/-f. You can use the exit command to quit a bash script early.
-# 2. Check that the student code has the correct file submitted. If they didn’t, detect and give helpful feedback about it.
-# 3. Somehow get the student code and your test .java file into the same directory
-# - Useful tools here might be cp and maybe mkdir
-# 4. Compile your tests and the student’s code from the appropriate directory with the appropriate classpath commands. 
-#    If the compilation fails, detect and give helpful feedback about it.
-# - Aside from the necessary javac, useful tools here are output redirection and error codes ($?) along with if
-# - This might be a time where you need to turn off set -e. Why?
-# 5. Run the tests and report the grade based on the JUnit output.
-# - Again output redirection will be useful, and also tools like grep could be helpful here
+echo "In student-submission"
+
+if [[ -e student-submission/ListExamples.java ]]
+then
+	echo "ListExamples.java found"
+else
+	echo "ListExamples.java not found"
+fi
+
+cp TestListExamples.java student-submission/
+
+cd student-submission/
+javac -cp .:../lib/hamcrest-core-1.3.jar:../lib/junit-4.13.2.jar *.java
+if [[ $? -eq 0 ]]
+then
+	echo "ListExamples.java  compiled"
+java -cp .:../lib/hamcrest-core-1.3.jar:../lib/junit-4.13.2.jar org.junit.runner.JUnitCore TestListExamples
+if [[ $? -eq 0 ]] 
+then 
+	echo "ListExamples.java passed all tests"
+else 
+	echo "java -cp .:../lib/hamcrest-core-1.3.jar../:lib/junit-4.13.2.jar org.junit.runner.JUnitCore TestListExamples > output.txt"
+	exit 1
+fi
+
+else 
+	echo "ListExamples.java did not compiled"
+	exit 1
+fi
 
